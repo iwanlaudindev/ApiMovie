@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ApiMovie.Controllers
 {
-    [ApiVersion("1.0")] // API versi 1.0
-    [Route("api/v{version:apiVersion}/[controller]")] // Route API versi 1.0
+    // [ApiVersion("1.0")] // API versi 1.0
+    // [Route("api/v{version:apiVersion}/[controller]")] // Route API versi 1.0
+    [Route("api/[controller]")]
     [ApiController]
     [Authorize]
     // [Authorize(Roles = "Admin")]

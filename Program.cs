@@ -25,18 +25,18 @@ builder.Services.AddScoped<JwtTokenGenerator>();
 // Menambahkan controller ke dalam service container (untuk REST API)
 builder.Services.AddControllers();
 
-builder.Services.AddApiVersioning(options =>
-{
-    options.ReportApiVersions = true; // Report API versions
-    options.DefaultApiVersion = new ApiVersion(1, 0); // Default API version
-    options.AssumeDefaultVersionWhenUnspecified = true; // Assume default version when unspecified
-});
+// builder.Services.AddApiVersioning(options =>
+// {
+//     options.ReportApiVersions = true; // Report API versions
+//     options.DefaultApiVersion = new ApiVersion(1, 0); // Default API version
+//     options.AssumeDefaultVersionWhenUnspecified = true; // Assume default version when unspecified
+// });
 
-builder.Services.AddVersionedApiExplorer(options =>
-{
-    options.GroupNameFormat = "'v'VVV"; // Group name format
-    options.SubstituteApiVersionInUrl = true; // Substitute API version in URL
-});
+// builder.Services.AddVersionedApiExplorer(options =>
+// {
+//     options.GroupNameFormat = "'v'VVV"; // Group name format
+//     options.SubstituteApiVersionInUrl = true; // Substitute API version in URL
+// });
 
 // Menambahkan layanan endpoint API explorer (Swagger/OpenAPI)
 builder.Services.AddEndpointsApiExplorer(); // Add Swagger
@@ -127,31 +127,7 @@ app.UseStatusCodePages(async context =>
 app.UseAuthentication();
 app.UseAuthorization();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
 // Mendaftarkan semua controller sebagai endpoint API
 app.MapControllers(); // Add controllers
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
