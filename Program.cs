@@ -1,7 +1,9 @@
 using System.Text.Json;
 using ApiMovie.Common;
+using ApiMovie.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 // Membuat builder untuk mengkonfigurasi aplikasi web
@@ -11,7 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting(options => options.LowercaseUrls = true); // Add lowercase URLs
 
 // Konfigurasi DbContext
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
 // Menambahkan layanan autentikasi JWT menggunakan konfigurasi dari appsettings.json
 builder.Services.AddJwtAuthentication(builder.Configuration); // Add JWT authentication
@@ -25,18 +31,18 @@ builder.Services.AddScoped<JwtTokenGenerator>();
 // Menambahkan controller ke dalam service container (untuk REST API)
 builder.Services.AddControllers();
 
-// builder.Services.AddApiVersioning(options =>
-// {
-//     options.ReportApiVersions = true; // Report API versions
-//     options.DefaultApiVersion = new ApiVersion(1, 0); // Default API version
-//     options.AssumeDefaultVersionWhenUnspecified = true; // Assume default version when unspecified
-// });
+builder.Services.AddApiVersioning(options =>
+{
+    options.ReportApiVersions = true; // Report API versions
+    options.DefaultApiVersion = new ApiVersion(1, 0); // Default API version
+    options.AssumeDefaultVersionWhenUnspecified = true; // Assume default version when unspecified
+});
 
-// builder.Services.AddVersionedApiExplorer(options =>
-// {
-//     options.GroupNameFormat = "'v'VVV"; // Group name format
-//     options.SubstituteApiVersionInUrl = true; // Substitute API version in URL
-// });
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV"; // Group name format
+    options.SubstituteApiVersionInUrl = true; // Substitute API version in URL
+});
 
 // Menambahkan layanan endpoint API explorer (Swagger/OpenAPI)
 builder.Services.AddEndpointsApiExplorer(); // Add Swagger
@@ -80,6 +86,7 @@ if (app.Environment.IsDevelopment())
 {
     // Menampilkan Swagger UI hanya saat development
     app.UseSwagger();
+    // app.UseSwaggerUI();
     app.UseSwaggerUI(options =>
     {
         var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
