@@ -28,6 +28,17 @@ builder.Services.AddAuthorization(); // Add authorization
 // Registrasi service untuk membuat JWT token, menggunakan Dependency Injection
 builder.Services.AddScoped<JwtTokenGenerator>();
 
+// Menambahkan CORS policy untuk mengizinkan semua origin, headers, dan methods
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
+
 // Menambahkan controller ke dalam service container (untuk REST API)
 builder.Services.AddControllers();
 
@@ -129,6 +140,7 @@ app.UseStatusCodePages(async context =>
     }
 });
 
+app.UseCors("AllowAll"); // Add CORS policy
 // Authentication & Authorization
 // Middleware untuk autentikasi dan otorisasi pengguna
 app.UseAuthentication();

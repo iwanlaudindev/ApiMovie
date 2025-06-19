@@ -170,7 +170,24 @@ namespace ApiMovie.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteStudent(int id)
         {
-            var student = await dbContext.Students.SingleOrDefaultAsync(s => s.Id == id);
+            // var student = await dbContext.Students.SingleOrDefaultAsync(s => s.Id == id);
+            var student = await(
+                from s in dbContext.Students
+                join sa in dbContext.StudentAddreses on s.Id equals sa.StudentId into saGroup
+                from sa in saGroup.DefaultIfEmpty()
+                where s.Id == id
+                select new Student
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    StudentAddreses = saGroup.Select(x => new StudentAddres
+                    {
+                        Id = x.Id,
+                        Street = x.Street,
+                        StudentId = x.StudentId
+                    }).ToList(),
+                }
+            ).SingleOrDefaultAsync();
             if (student == null)
             {
                 return NotFound();
